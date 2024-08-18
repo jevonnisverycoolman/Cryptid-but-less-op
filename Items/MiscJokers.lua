@@ -2,7 +2,7 @@ local dropshot = {
     object_type = "Joker",
 	name = "cry-Dropshot",
 	key = "dropshot",
-    	config = {extra = {Xmult_mod = 0.2, x_mult = 1}},
+    	config = {extra = {Xmult_mod = 0.1, x_mult = 1}},
 	pos = {x = 5, y = 0},
 	loc_txt = {
         name = 'Dropshot',
@@ -278,7 +278,7 @@ local wee_fib = {
 	object_type = "Joker",
 	name = "cry-Wee Fibonacci",
 	key = "wee_fib",
-	config = {extra = {mult = 0, mult_mod = 3}},
+	config = {extra = {mult = 0, mult_mod = 1}},
 	pos = {x = 1, y = 5},
 	loc_txt = {
         name = 'Weebonacci',
@@ -338,7 +338,7 @@ local whip = {
     name = "cry-The WHIP",
     key = "whip",
     pos = {x = 5, y = 3},
-    config = {extra = {Xmult_mod = 0.5, x_mult = 1}},
+    config = {extra = {Xmult_mod = 0.2, x_mult = 1}},
     loc_txt = {
         name = 'The WHIP',
         text = { "This Joker gains {X:mult,C:white} X#1# {} Mult",
@@ -346,7 +346,7 @@ local whip = {
         "{C:attention}2{} and {C:attention}7{} of different suits",
         "{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)"}
     },
-    rarity = 2,
+    rarity = 3,
     cost = 8,
     blueprint_compat = true,
     perishable_compat = false,
@@ -399,7 +399,7 @@ local lucky_joker = {
     object_type = "Joker",
 	name = "cry-Lucky Joker",
 	key = "lucky_joker",
-    config = {extra = { dollars = 5}},
+    config = {extra = { dollars = 4}},
 	pos = {x = 4, y = 3},
 	loc_txt = {
         name = 'Lucky Joker',
