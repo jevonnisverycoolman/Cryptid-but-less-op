@@ -4535,4 +4535,4 @@ return {name = "Misc. Jokers",
             end
 
         end,
-        items = {jimball_sprite, dropshot, wee_fib, cube, whip, jimball, big_cube, lucky_joker, lightupthenight, fspinner, hunger, nice, krustytheclown, happy, magnet}}
+        items = {jimball_sprite, dropshot, wee_fib, cube, whip, jimball, big_cube, lucky_joker, lightupthenight, fspinner, hunger, nice, krustytheclown, happy, magnet, cursor,}}
