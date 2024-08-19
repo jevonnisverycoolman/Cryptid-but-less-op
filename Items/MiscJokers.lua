@@ -602,7 +602,7 @@ local cube = {
             "{C:chips}+#1#{} Chips"
         }
     	},
-	rarity = 1,
+	rarity = 2,
 	cost = -27,
     	blueprint_compat = true,
 	atlas = "atlasone",
