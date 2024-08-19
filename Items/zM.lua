@@ -1331,7 +1331,7 @@ local macabre = {
         end
 	end,
 }
-local ret_items = {jollysus,kidnap,bubblem,foodm,mstack,mneon,notebook,bonk,morse,loopy,scrabble,sacrifice,reverse,macabre}
+local ret_items = {}
 for _, v in pairs(ret_items) do
     Cryptid.M_jokers["j_cry_" .. v.key] = true
 end
@@ -1346,13 +1346,13 @@ return {name = "M Jokers",
                 end
             end
             if cry_enable_epics then
-                for _, jkr in pairs({doodlem, virgo, smallestm, biggestm}) do
+                for _, jkr in pairs({}) do
                     Cryptid.M_jokers["j_cry_" .. jkr.key] = true
                     ret_items[#ret_items+1] = jkr
                 end
             end
             if cry_enable_exotics then
-                for _, jkr in pairs({hugem}) do
+                for _, jkr in pairs({}) do
                     Cryptid.M_jokers["j_cry_" .. jkr.key] = true
                     ret_items[#ret_items+1] = jkr
                 end
