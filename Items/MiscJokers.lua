@@ -941,7 +941,7 @@ local nice = {
     object_type = "Joker",
 	name = "cry-Nice",
 	key = "nice",
-    config = {extra = {chips = 420, sixcount = 0, ninecount = 0}},
+    config = {extra = {chips = 150, sixcount = 0, ninecount = 0}},
 	pos = {x = 2, y = 3},
 	loc_txt = {
         name = 'Nice',
@@ -952,7 +952,7 @@ local nice = {
         }
     },
 	rarity = 3,
-	cost = 6.9,
+	cost = 8,
 	atlas = "atlasone",
     blueprint_compat = true,loc_vars = function(self, info_queue, center)
         return {vars = {center.ability.extra.chips}}
@@ -1100,7 +1100,7 @@ local jimball = {
 	name = "cry-Jimball",
 	key = "jimball",
 	pos = {x = 0, y = 0},
-    config = {x_mult = 1, extra = 0.15, override_x_mult_check = true},
+    config = {x_mult = 1, extra = 0.1, override_x_mult_check = true},
 	loc_txt = {
         name = 'Jimball',
         text = {
@@ -1246,7 +1246,7 @@ local fspinner = {
 	name = "cry-fspinner",
 	key = "fspinner",
 	pos = {x = 4, y = 0},
-        config = {extra = {chips = 0, chip_mod = 14}},
+        config = {extra = {chips = 0, chip_mod = 6}},
 	loc_txt = {
         name = 'Fidget Spinner',
         text = {
@@ -1516,7 +1516,7 @@ local lightupthenight = {
     	}
 	},
 	rarity = 3,
-	cost = 7,
+	cost = 9,
 	blueprint_compat = true,
 	loc_vars = function(self, info_queue, center)
 		return {vars = {center.ability.extra.xmult}}
@@ -1578,7 +1578,7 @@ local nosound = {
         }
     },
     rarity = 3,
-    cost = 7,
+    cost = 8,
     blueprint_compat = true,
     loc_vars = function(self, info_queue, center)
         return {vars = { center.ability.extra.retriggers}}
@@ -1671,7 +1671,7 @@ local hunger = {
     	object_type = "Joker",
 	name = "cry-hunger",
 	key = "hunger",
-    	config = {extra = {money = 3}},
+    	config = {extra = {money = 2}},
 	pos = {x = 3, y = 0},
 	loc_txt = {
         name = 'Consume-able',
