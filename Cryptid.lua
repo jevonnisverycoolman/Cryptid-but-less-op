@@ -428,12 +428,6 @@ for _, file in ipairs(files) do
     end
 end
 
-local G_FUNCS_options_ref = G.FUNCS.options
-G.FUNCS.options = function(e)
-  G_FUNCS_options_ref(e)
-  NFS.write(mod_path.."/config.lua", STR_PACK(Cryptid_config))
-end
-
 if not SpectralPack then
     SpectralPack = {}
     local ct = create_tabs
@@ -748,7 +742,15 @@ function create_card(_type, area, legendary, _rarity, skip_materialize, soulable
   if card.ability.consumeable and card.pinned then	-- counterpart is in Sticker.toml
       G.GAME.cry_pinned_consumeables = G.GAME.cry_pinned_consumeables + 1
   end
-
+  if card.ability.name == "cry-meteor" then 
+	card:set_edition('e_foil', true)
+  end
+  if card.ability.name == "cry-exoplanet" then 
+	card:set_edition('e_holo', true)
+  end
+  if card.ability.name == "cry-stardust" then 
+	card:set_edition('e_polychrome', true)
+  end
   return card
 end
 

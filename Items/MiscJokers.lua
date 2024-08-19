@@ -1310,6 +1310,51 @@ if JokerDisplay then
         end
     }
 end
+local luigi = {
+	object_type = "Joker",
+	name = "cry-luigi",
+	key = "luigi",
+	pos = {x = 0, y = 3},
+    soul_pos = {x = 1, y = 3},
+    config = {extra = {x_chips = 3}},
+	loc_txt = {
+        name = 'Luigi',
+        text = {
+            "All Jokers give",
+            "{X:chips,C:white} X#1# {} Chips"
+		}
+    },
+	loc_vars = function(self, info_queue, center)
+		return {vars = {center.ability.extra.x_chips}}
+    end,
+	rarity = 4,
+	cost = 20,
+	blueprint_compat = true,
+	calculate = function(self, card, context)
+        if context.other_joker and context.other_joker.ability.set == "Joker" then
+            if not Talisman.config_file.disable_anims then 
+                G.E_MANAGER:add_event(Event({
+                    func = function()
+                        context.other_joker:juice_up(0.5, 0.5)
+                        return true
+                    end
+                })) 
+            end
+            return {
+                message = localize{type='variable',key='a_xchips',vars={card.ability.extra.x_chips}}, colour = G.C.CHIPS,
+                Xchip_mod = card.ability.extra.x_chips
+            }
+        end
+	end,
+	atlas = "atlasthree",
+}
+if JokerDisplay then
+    luigi.joker_display_definition = {
+        mod_function = function(card, mod_joker)
+            return { x_chips = mod_joker.ability.extra.x_chips }
+        end
+    }
+end
 local waluigi = {
 	object_type = "Joker",
 	name = "cry-Waluigi",
@@ -2295,6 +2340,80 @@ if JokerDisplay then
     }
 end
 
+local blender = {
+    object_type = "Joker",
+    name = "cry-blender",
+    key = "blender",
+    pos = {x = 3, y = 2},
+    loc_txt = {
+        name = 'Blender',
+        text = {
+            "Create a {C:attention}random{} consumable",
+            "when a {C:cry_code}Code{} card is used",
+        }
+    },
+    rarity = 3,
+    cost = 8,
+    blueprint_compat = true,
+    perishable_compat = false,
+    atlas = "atlasthree",
+    calculate = function(self, card, context)
+        if context.using_consumeable and context.consumeable.ability.set == 'Code' and not context.consumeable.beginning_end then
+			if #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+                 local card = create_card('Consumeables', G.consumables, nil, nil, nil, nil, nil, 'cry_blender')
+                 card:add_to_deck()
+                 G.consumeables:emplace(card)
+            end
+        end
+    end
+}
+
+local python = {
+    object_type = "Joker",
+    name = "cry-python",
+    key = "python",
+    config = {extra = {Xmult = 1, Xmult_mod = 0.15}},
+    pos = {x = 4, y = 2},
+    loc_txt = {
+        name = 'Python',
+        text = {
+            "This Joker gains {X:mult,C:white} X#1# {} Mult",
+            "when a {C:cry_code}Code{} card is used",
+            "{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)"
+        }
+    },
+    rarity = 2,
+    cost = 7,
+    blueprint_compat = true,
+    perishable_compat = false,
+    atlas = "atlasthree",
+    loc_vars = function(self, info_queue, center)
+        return {vars = {center.ability.extra.Xmult_mod, center.ability.extra.Xmult}}
+    end,
+    calculate = function(self, card, context)
+           if context.using_consumeable and context.consumeable.ability.set == 'Code' and not context.consumeable.beginning_end then
+            card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_mod
+            G.E_MANAGER:add_event(Event({
+                func = function() card_eval_status_text(card, 'extra', nil, nil, nil, {message = localize{type='variable',key='a_xmult',vars={card.ability.extra.Xmult}}}); return true
+                end}))
+            return
+        end
+    end
+}
+if JokerDisplay then
+    python.joker_display_definition = {
+        text = {
+            {
+                border_nodes = {
+                    { text = "X" },
+                    { ref_table = "card.ability.extra", ref_value = "Xmult", retrigger_type = "exp" }
+                },
+                border_colour = G.C.DARK_EDITION
+            }
+        },
+    }
+end
+
 local sapling = {
 	object_type = "Joker",
 	name = "cry-sapling",
@@ -2491,18 +2610,21 @@ local meteor = {
         name = 'Meteor Shower',
         text = {
             "{C:dark_edition}Foil{} cards each",
-            "give {C:chips}+#1#{} Chips"
+            "give {C:chips}+#1#{} Chips",
+	    "{C:inactive,s:0.8}Effect does not trigger",
+            "{C:inactive,s:0.8}on Meteor Shower"
         }
     },
     loc_vars = function(self, info_queue, center)
 	info_queue[#info_queue+1] = G.P_CENTERS.e_foil
         return {vars = {center.ability.extra.chips}}
     end,
-    rarity = 2,
-    cost = 5,
+    rarity = 1,
+    cost = 4,
     blueprint_compat = true,
     calculate = function(self, card, context)
-        if context.other_joker and context.other_joker.edition and context.other_joker.edition.foil == true then
+        if context.other_joker and context.other_joker.edition 
+	and context.other_joker.edition.foil == true and context.other_joker.ability.name ~= "cry-meteor" then
             if not Talisman.config_file.disable_anims then 
                 G.E_MANAGER:add_event(Event({
                     func = function()
@@ -2581,18 +2703,21 @@ local exoplanet = {
         name = 'Exoplanet',
         text = {
             "{C:dark_edition}Holographic{} cards",
-            "each give {C:mult}+#1#{} Mult"
+            "each give {C:mult}+#1#{} Mult",
+	    "{C:inactive,s:0.8}Effect does not trigger",
+            "{C:inactive,s:0.8}on Exoplanet"
 		}
     	},
 	loc_vars = function(self, info_queue, center)
 		info_queue[#info_queue+1] = G.P_CENTERS.e_holo
 		return {vars = {center.ability.extra.mult}}
     	end,
-	rarity = 2,
-	cost = 5,
+	rarity = 1,
+	cost = 3,
 	blueprint_compat = true,
 	calculate = function(self, card, context)
-        if context.other_joker and context.other_joker.edition and context.other_joker.edition.holo == true then
+        if context.other_joker and context.other_joker.edition
+	and context.other_joker.edition.holo == true and context.other_joker.ability.name ~= "cry-exoplanet" then
             if not Talisman.config_file.disable_anims then 
                 G.E_MANAGER:add_event(Event({
                     func = function()
@@ -2607,12 +2732,12 @@ local exoplanet = {
             }
         end
 	if context.individual and context.cardarea == G.play then
-			if context.other_card.edition and context.other_card.edition.holo == true then
-            			return {
-                    			mult = card.ability.extra.mult,
-                    			colour = G.C.MULT,
-                    			card = card
-                			}
+		if context.other_card.edition and context.other_card.edition.holo == true then
+            		return {
+				mult = card.ability.extra.mult,
+            			colour = G.C.MULT,
+                    		card = card
+                		}
 			end
 	end
 	if context.individual and context.cardarea == G.hand and context.other_card.edition and context.other_card.edition.holo == true and not context.end_of_round then
@@ -2671,18 +2796,21 @@ local stardust = {
         name = 'Stardust',
         text = {
             "{C:dark_edition}Polychrome{} cards",
-            "each give {X:mult,C:white}X#1#{} Mult"
+            "each give {X:mult,C:white}X#1#{} Mult",
+	    "{C:inactive,s:0.8}Effect does not trigger",
+            "{C:inactive,s:0.8}on Stardust"
 		}
     	},
 	loc_vars = function(self, info_queue, center)
 		info_queue[#info_queue+1] = G.P_CENTERS.e_polychrome
 		return {vars = {center.ability.extra.xmult}}
     	end,
-	rarity = 2,
-	cost = 6,
+	rarity = 1,
+	cost = 2,
 	blueprint_compat = true,
 	calculate = function(self, card, context)
-        if context.other_joker and context.other_joker.edition and context.other_joker.edition.polychrome == true then
+        if context.other_joker and context.other_joker.edition 
+	and context.other_joker.edition.polychrome == true and context.other_joker.ability.name ~= "cry-stardust" then
             if not Talisman.config_file.disable_anims then 
                 G.E_MANAGER:add_event(Event({
                     func = function()
@@ -4507,7 +4635,7 @@ return {name = "Misc. Jokers",
             function Card:set_cost()
                 sc(self)
                 if self.ability.name == "cry-Cube" then
-                    self.cost = -25
+                    self.cost = -27
                 end
                 if self.ability.name == "cry-Big Cube" then
                     self.cost = 27
@@ -4535,4 +4663,6 @@ return {name = "Misc. Jokers",
             end
 
         end,
+
         items = {jimball_sprite, dropshot, wee_fib, cube, whip, jimball, big_cube, lucky_joker, lightupthenight, fspinner, hunger, nice, krustytheclown, happy, magnet, cursor,}}
+
