@@ -1948,7 +1948,7 @@ local magnet = {
     name = "cry-magnet",
     key = "magnet",
     pos = {x = 4, y = 0},
-    config = {extra = {money = 2, Xmoney = 5, slots = 4}},
+    config = {extra = {money = 2, Xmoney = 5, slots = 3}},
     loc_txt = {
         name = 'Fridge Magnet',
         text = {
@@ -2440,7 +2440,7 @@ local happy = {
         }
     },
     rarity = 1,
-    cost = 2,
+    cost = 5,
     blueprint_compat = true,
     eternal_compat = false,
     atlas = "atlastwo",
