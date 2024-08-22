@@ -3,7 +3,7 @@ local dropshot = {
     object_type = "Joker",
 	name = "cry-Dropshot",
 	key = "dropshot",
-    	config = {extra = {Xmult_mod = 0.2, x_mult = 1}},
+    	config = {extra = {Xmult_mod = 0.1, x_mult = 1}},
 	pos = {x = 5, y = 0},
 	loc_txt = {
         name = 'Dropshot',
@@ -281,7 +281,7 @@ local wee_fib = {
 	object_type = "Joker",
 	name = "cry-Wee Fibonacci",
 	key = "wee_fib",
-	config = {extra = {mult = 0, mult_mod = 3}},
+	config = {extra = {mult = 0, mult_mod = 1}},
 	pos = {x = 1, y = 5},
 	loc_txt = {
         name = 'Weebonacci',
@@ -341,7 +341,7 @@ local whip = {
     name = "cry-The WHIP",
     key = "whip",
     pos = {x = 5, y = 3},
-    config = {extra = {Xmult_mod = 0.5, x_mult = 1}},
+    config = {extra = {Xmult_mod = 0.2, x_mult = 1}},
     loc_txt = {
         name = 'The WHIP',
         text = { "This Joker gains {X:mult,C:white} X#1# {} Mult",
@@ -349,7 +349,7 @@ local whip = {
         "{C:attention}2{} and {C:attention}7{} of different suits",
         "{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)"}
     },
-    rarity = 2,
+    rarity = 3,
     cost = 8,
     blueprint_compat = true,
     perishable_compat = false,
@@ -402,7 +402,7 @@ local lucky_joker = {
     object_type = "Joker",
 	name = "cry-Lucky Joker",
 	key = "lucky_joker",
-    config = {extra = { dollars = 5}},
+    config = {extra = { dollars = 4}},
 	pos = {x = 4, y = 3},
 	loc_txt = {
         name = 'Lucky Joker',
@@ -606,7 +606,7 @@ local cube = {
             "{C:chips}+#1#{} Chips"
         }
     	},
-	rarity = 1,
+	rarity = 2,
 	cost = -27,
     	blueprint_compat = true,
 	atlas = "atlasone",
@@ -946,7 +946,7 @@ local nice = {
     object_type = "Joker",
 	name = "cry-Nice",
 	key = "nice",
-    config = {extra = {chips = 420, sixcount = 0, ninecount = 0}},
+    config = {extra = {chips = 150, sixcount = 0, ninecount = 0}},
 	pos = {x = 2, y = 3},
 	loc_txt = {
         name = 'Nice',
@@ -957,7 +957,7 @@ local nice = {
         }
     },
 	rarity = 3,
-	cost = 6.9,
+	cost = 8,
 	atlas = "atlasone",
     blueprint_compat = true,loc_vars = function(self, info_queue, center)
         return {vars = {center.ability.extra.chips}}
@@ -1106,7 +1106,7 @@ local jimball = {
 	name = "cry-Jimball",
 	key = "jimball",
 	pos = {x = 0, y = 0},
-    config = {x_mult = 1, extra = 0.15, override_x_mult_check = true},
+    config = {x_mult = 1, extra = 0.1, override_x_mult_check = true},
 	loc_txt = {
         name = 'Jimball',
         text = {
@@ -1252,7 +1252,7 @@ local fspinner = {
 	name = "cry-fspinner",
 	key = "fspinner",
 	pos = {x = 4, y = 0},
-        config = {extra = {chips = 0, chip_mod = 14}},
+        config = {extra = {chips = 0, chip_mod = 6}},
 	loc_txt = {
         name = 'Fidget Spinner',
         text = {
@@ -1644,7 +1644,7 @@ local lightupthenight = {
     	}
 	},
 	rarity = 3,
-	cost = 7,
+	cost = 9,
 	blueprint_compat = true,
 	loc_vars = function(self, info_queue, center)
 		return {vars = {center.ability.extra.xmult}}
@@ -1706,7 +1706,7 @@ local nosound = {
         }
     },
     rarity = 3,
-    cost = 7,
+    cost = 8,
     blueprint_compat = true,
     loc_vars = function(self, info_queue, center)
         return {vars = { center.ability.extra.retriggers}}
@@ -1799,7 +1799,7 @@ local hunger = {
     	object_type = "Joker",
 	name = "cry-hunger",
 	key = "hunger",
-    	config = {extra = {money = 3}},
+    	config = {extra = {money = 2}},
 	pos = {x = 3, y = 0},
 	loc_txt = {
         name = 'Consume-able',
@@ -2077,7 +2077,7 @@ local magnet = {
     name = "cry-magnet",
     key = "magnet",
     pos = {x = 4, y = 0},
-    config = {extra = {money = 2, Xmoney = 5, slots = 4}},
+    config = {extra = {money = 2, Xmoney = 5, slots = 3}},
     loc_txt = {
         name = 'Fridge Magnet',
         text = {
@@ -2506,7 +2506,7 @@ local happy = {
         }
     },
     rarity = 1,
-    cost = 2,
+    cost = 5,
     blueprint_compat = true,
     eternal_compat = false,
     atlas = "atlastwo",
@@ -4618,4 +4618,5 @@ return {name = "Misc. Jokers",
             end
 
         end,
-        items = {jimball_sprite, dropshot, happyhouse, maximized, potofjokes, queensgambit, wee_fib, compound_interest, whip, pickle, triplet_rhythm, booster, chili_pepper, lucky_joker, cursor, cube, big_cube, nice, sus, chad, jimball, luigi, waluigi, mario, wario, eternalflame, seal_the_deal, fspinner, krustytheclown, blurred, gardenfork, lightupthenight, nosound, antennastoheaven, hunger, weegaming, redbloon, apjoker, maze, panopticon, magnet, unjust_dagger, monkey_dagger, pirate_dagger, mondrian, sapling, spaceglobe, happy, meteor, exoplanet, stardust, rnjoker, filler, duos, home, nuts, quintet, unity, swarm, coin, wheelhope, night, busdriver, oldblueprint}}
+
+        items = {jimball_sprite, dropshot, wee_fib, cube, whip, jimball, big_cube, lucky_joker, lightupthenight, fspinner, hunger, nice, krustytheclown, happy, magnet, cursor,}}
