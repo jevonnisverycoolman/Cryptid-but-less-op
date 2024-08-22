@@ -1,3 +1,4 @@
+cry_enable_jokers = false
 local dropshot = {
     object_type = "Joker",
 	name = "cry-Dropshot",
@@ -93,6 +94,7 @@ local happyhouse = {
     key = "happyhouse",
     pos = {x = 2, y = 4},
     config = {extra = {mult = 4, check = 0}},
+	immune_to_chemach = true,
     loc_txt = {
         name = 'Happy House',
         text = { "{X:dark_edition,C:white}^#1#{} Mult only after",
@@ -189,6 +191,7 @@ local potofjokes = {
 	key = "pot_of_jokes",
 	config = {extra = {h_size = -2, h_mod = 1}},
 	pos = {x = 5, y = 0},
+	immune_to_chemach = true,
 	loc_txt = {
         name = 'Pot of Jokes',
         text = {
@@ -510,6 +513,7 @@ local pickle = {
 	key = "pickle",
     	config = {extra = {tags = 3, tags_mod = 1}},
 	pos = {x = 3, y = 3},
+	immune_to_chemach = true,
 	loc_txt = {
         name = 'Pickle',
         text = {
@@ -696,6 +700,7 @@ local booster = {
 	key = "booster",
     config = {extra = {booster_slots = 1}},
 	pos = {x = 2, y = 0},
+	immune_to_chemach = true,
 	loc_txt = {
         name = 'Booster Joker',
         text = {
@@ -1051,6 +1056,7 @@ local chad = {
 	key = "chad",
 	pos = {x = 0, y = 3},
 	config = {extra = {retriggers = 2}},
+	immune_to_chemach = true,
 	loc_txt = {
         name = 'Chad',
         text = {
@@ -1351,7 +1357,7 @@ local luigi = {
 if JokerDisplay then
     luigi.joker_display_definition = {
         mod_function = function(card, mod_joker)
-            return { x_chips = mod_joker.ability.extra.x_chips }
+            return { x_chips = mod_joker.ability.extra.x_chips ^ JokerDisplay.calculate_joker_triggers(mod_joker) }
         end
     }
 end
@@ -1397,6 +1403,83 @@ if JokerDisplay then
     waluigi.joker_display_definition = {
         mod_function = function(card, mod_joker)
             return { x_mult = mod_joker.ability.extra.Xmult ^ JokerDisplay.calculate_joker_triggers(mod_joker) }
+        end
+    }
+end
+
+local mario = {
+    object_type = "Joker",
+    name = "cry-mario",
+    key = "mario",
+    config = {extra = {retriggers = 1}},
+    pos = {x = 4, y = 3},
+    soul_pos = {x = 5, y = 3},
+    loc_txt = {
+        name = 'Mario',
+        text = {
+            "All Jokers",
+            "retrigger {C:attention}#1#{} additional time"
+            }
+        },
+    rarity = 4,
+    cost = 20,
+    blueprint_compat = true,
+	immune_to_chemach = true,
+    loc_vars = function(self, info_queue, center)
+        return {vars = {center.ability.extra.retriggers}}
+    end,
+    atlas = "atlasthree",
+    calculate = function(self, card, context)
+        if context.retrigger_joker_check and not context.retrigger_joker and context.other_card ~= self then
+                return {
+                    message = localize('k_again_ex'),
+                    repetitions = card.ability.extra.retriggers,
+                    card = card
+                }
+        end
+    end
+}
+if JokerDisplay then
+    mario.joker_display_definition = {
+        retrigger_joker_function = function (card, retrigger_joker)
+            return card ~= retrigger_joker and retrigger_joker.ability.extra.retriggers or 0
+        end
+    }
+end
+local wario = {
+	object_type = "Joker",
+	name = "cry-wario",
+	key = "wario",
+	pos = {x = 2, y = 3},
+    soul_pos = {x = 3, y = 3 },
+    config = {extra = {money = 3}},
+    
+	loc_txt = {
+        name = 'Wario',
+        text = {
+            "All Jokers give",
+            "{C:money}$#1#{} at end of round",
+		}
+    },
+	loc_vars = function(self, info_queue, center)
+		return {vars = {center.ability.extra.money}}
+    end,
+
+calc_dollar_bonus = function(self, card)
+  if G.jokers and G.jokers.cards then
+    return #G.jokers.cards * card.ability.extra.money
+  end
+end,
+
+	rarity = 4,
+	cost = 20,
+
+	atlas = "atlasthree",
+}
+if JokerDisplay then
+    wario.joker_display_definition = {
+        mod_function = function(card, mod_joker)
+            return { dollars = mod_joker.ability.extra.money }
         end
     }
 end
@@ -1793,6 +1876,7 @@ local redbloon = {
     key = "redbloon",
     config = {extra = {money = 20, rounds_remaining = 2, text = "s"}},
     pos = {x = 5, y = 1},
+	immune_to_chemach = true,
     loc_txt = {
         name = 'Red Bloon',
         text = {
@@ -2274,145 +2358,7 @@ if JokerDisplay then
     }
 end
 
-local cut = {
-    object_type = "Joker",
-    name = "cry-cut",
-    key = "cut",
-    config = {extra = {Xmult = 1, Xmult_mod = 0.5}},
-    pos = {x = 2, y = 2},
-    loc_txt = {
-        name = 'Cut',
-        text = {
-            "This Joker destroys a random {C:cry_code}Code{} card",
-            "at the end of {C:attention}shop{}, and gains {X:mult,C:white} X#1# {} Mult",
-            "{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)"
-        }
-    },
-    rarity = 3,
-    cost = 9,
-    blueprint_compat = true,
-    perishable_compat = false,
-    atlas = "atlasthree",
-    calculate = function(self, card, context)
-        if context.ending_shop then
-            local destructable_codecard = {}
-            for i = 1, #G.consumeables.cards do
-                if G.consumeables.cards[i].ability.set == 'Code' and not G.consumeables.cards[i].getting_sliced then destructable_codecard[#destructable_codecard+1] = G.consumeables.cards[i] end
-            end
-            local codecard_to_destroy = #destructable_codecard > 0 and pseudorandom_element(destructable_codecard, pseudoseed('cut')) or nil
 
-            if codecard_to_destroy then 
-                codecard_to_destroy.getting_sliced = true
-                G.E_MANAGER:add_event(Event({func = function()
-                    (context.blueprint_card or card):juice_up(0.8, 0.8)
-                    codecard_to_destroy:start_dissolve({G.C.RED}, nil, 1.6)
-                    card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_mod
-                return true end }))
-                if not (context.blueprint_card or self).getting_sliced then
-                    card_eval_status_text((context.blueprint_card or card), 'extra', nil, nil, nil, {message = "X"..number_format(to_big(card.ability.extra.Xmult + card.ability.extra.Xmult_mod)).." Mult"})
-                end
-                return {calculated = true}, true
-            end
-        end
-        if context.cardarea == G.jokers and (to_big(card.ability.extra.Xmult) > to_big(1)) and not context.before and not context.after then
-            return {
-                message = "X"..number_format(card.ability.extra.Xmult).." Mult",
-                Xmult_mod = card.ability.extra.Xmult,
-                colour = G.C.DARK_EDITION
-            }
-        end
-    end,
-    loc_vars = function(self, info_queue, center)
-        return {vars = {center.ability.extra.Xmult_mod, center.ability.extra.Xmult}}
-    end
-}
-if JokerDisplay then
-    cut.joker_display_definition = {
-        text = {
-            {
-                border_nodes = {
-                    { text = "X" },
-                    { ref_table = "card.ability.extra", ref_value = "Xmult", retrigger_type = "exp" }
-                },
-                border_colour = G.C.DARK_EDITION
-            }
-        },
-    }
-end
-
-local blender = {
-    object_type = "Joker",
-    name = "cry-blender",
-    key = "blender",
-    pos = {x = 3, y = 2},
-    loc_txt = {
-        name = 'Blender',
-        text = {
-            "Create a {C:attention}random{} consumable",
-            "when a {C:cry_code}Code{} card is used",
-        }
-    },
-    rarity = 3,
-    cost = 8,
-    blueprint_compat = true,
-    perishable_compat = false,
-    atlas = "atlasthree",
-    calculate = function(self, card, context)
-        if context.using_consumeable and context.consumeable.ability.set == 'Code' and not context.consumeable.beginning_end then
-			if #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
-                 local card = create_card('Consumeables', G.consumables, nil, nil, nil, nil, nil, 'cry_blender')
-                 card:add_to_deck()
-                 G.consumeables:emplace(card)
-            end
-        end
-    end
-}
-
-local python = {
-    object_type = "Joker",
-    name = "cry-python",
-    key = "python",
-    config = {extra = {Xmult = 1, Xmult_mod = 0.15}},
-    pos = {x = 4, y = 2},
-    loc_txt = {
-        name = 'Python',
-        text = {
-            "This Joker gains {X:mult,C:white} X#1# {} Mult",
-            "when a {C:cry_code}Code{} card is used",
-            "{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)"
-        }
-    },
-    rarity = 2,
-    cost = 7,
-    blueprint_compat = true,
-    perishable_compat = false,
-    atlas = "atlasthree",
-    loc_vars = function(self, info_queue, center)
-        return {vars = {center.ability.extra.Xmult_mod, center.ability.extra.Xmult}}
-    end,
-    calculate = function(self, card, context)
-           if context.using_consumeable and context.consumeable.ability.set == 'Code' and not context.consumeable.beginning_end then
-            card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_mod
-            G.E_MANAGER:add_event(Event({
-                func = function() card_eval_status_text(card, 'extra', nil, nil, nil, {message = localize{type='variable',key='a_xmult',vars={card.ability.extra.Xmult}}}); return true
-                end}))
-            return
-        end
-    end
-}
-if JokerDisplay then
-    python.joker_display_definition = {
-        text = {
-            {
-                border_nodes = {
-                    { text = "X" },
-                    { ref_table = "card.ability.extra", ref_value = "Xmult", retrigger_type = "exp" }
-                },
-                border_colour = G.C.DARK_EDITION
-            }
-        },
-    }
-end
 
 local sapling = {
 	object_type = "Joker",
@@ -2420,6 +2366,7 @@ local sapling = {
 	key = "sapling",
 	pos = {x = 3, y = 2},
 	config = {extra = {score = 0, req = 30}},
+	immune_to_chemach = true,
 	loc_txt = {
         name = 'Sapling',
         text = {
@@ -2616,7 +2563,9 @@ local meteor = {
         }
     },
     loc_vars = function(self, info_queue, center)
-	info_queue[#info_queue+1] = G.P_CENTERS.e_foil
+        if not center.edition or (center.edition and not center.edition.foil) then
+            info_queue[#info_queue+1] = G.P_CENTERS.e_foil
+        end
         return {vars = {center.ability.extra.chips}}
     end,
     rarity = 1,
@@ -2709,7 +2658,9 @@ local exoplanet = {
 		}
     	},
 	loc_vars = function(self, info_queue, center)
-		info_queue[#info_queue+1] = G.P_CENTERS.e_holo
+        if not center.edition or (center.edition and not center.edition.holo) then
+            info_queue[#info_queue+1] = G.P_CENTERS.e_holo
+        end
 		return {vars = {center.ability.extra.mult}}
     	end,
 	rarity = 1,
@@ -2802,7 +2753,9 @@ local stardust = {
 		}
     	},
 	loc_vars = function(self, info_queue, center)
-		info_queue[#info_queue+1] = G.P_CENTERS.e_polychrome
+		if not center.edition or (center.edition and not center.edition.polychrome) then
+            info_queue[#info_queue+1] = G.P_CENTERS.e_polychrome
+        end
 		return {vars = {center.ability.extra.xmult}}
     	end,
 	rarity = 1,
@@ -4537,6 +4490,7 @@ local busdriver = {
     key = "busdriver",
     config = {extra = {mult = 50, odds = 4}},
     pos = {x = 5, y = 1},
+	immune_to_chemach = true,
     loc_txt = {
         name = 'Bus Driver',
         text = {
@@ -4583,6 +4537,7 @@ if JokerDisplay then
 end
 return {name = "Misc. Jokers", 
         init = function()
+	    cry_enable_jokers = true
             --Dropshot Patches
             local gigo = Game.init_game_object;
             function Game:init_game_object()
@@ -4665,4 +4620,3 @@ return {name = "Misc. Jokers",
         end,
 
         items = {jimball_sprite, dropshot, wee_fib, cube, whip, jimball, big_cube, lucky_joker, lightupthenight, fspinner, hunger, nice, krustytheclown, happy, magnet, cursor,}}
-

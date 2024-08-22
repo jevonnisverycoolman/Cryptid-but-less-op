@@ -82,6 +82,7 @@ local googol_play = {
 	key = "googol_play",
 	config = {extra = {Xmult = 1e100, odds = 8}},
 	pos = {x = 3, y = 0},
+	immune_to_chemach = true,
 	loc_txt = {
         name = 'Googol Play Card',
         text = {
@@ -152,8 +153,18 @@ local sync_catalyst = {
 	calculate = function(self, card, context)
 		if context.cardarea == G.jokers and not context.before and not context.after then
 			local tot = hand_chips + mult
-			hand_chips = mod_chips(math.floor(tot/2))
-			mult = mod_mult(math.floor(tot/2))
+			if not tot.array or #tot.array < 2 or tot.array[2] < 2 then --below eXeY notation
+				hand_chips = mod_chips(math.floor(tot/2))
+				mult = mod_mult(math.floor(tot/2))
+			else
+				if hand_chips > mult then
+					tot = hand_chips
+				else
+					tot = mult
+				end
+				hand_chips = mod_chips(tot)
+				mult = mod_chips(tot)
+			end
 			update_hand_text({delay = 0}, {mult = mult, chips = hand_chips})
 			return {
 				message = localize('k_balanced'),
@@ -251,6 +262,7 @@ local error_joker = {
 	key = "error",
 	pos = {x = 4, y = 2},
 	config = {extra = {sell_rounds = 0, active = false}},
+	immune_to_chemach = true,
 	loc_txt = {
         name = '{C:red}ERR{}{C:dark_edition}O{}{C:red}R{}',
         text = {
@@ -424,112 +436,13 @@ local M = {
 	end
 }
 
-local CodeJoker = {
-	object_type = "Joker",
-	name = "cry-CodeJoker",
-	key = "CodeJoker",
-	pos = {x = 2, y = 4},
-	loc_txt = {
-        name = 'Code Joker',
-        text = {
-			"Create a {C:dark_edition}Negative{}",
-			"{C:cry_code}Code Card{} when",
-			"{C:attention}Blind{} is selected"
-		}
-    },
-	rarity = "cry_epic",
-	cost = 11,
-	blueprint_compat = true,
-	atlas = "atlasepic",
-	calculate = function(self, card, context)
-        if context.setting_blind and not (context.blueprint_card or self).getting_sliced then
-			play_sound('timpani')
-			local card = create_card('Code', G.consumables, nil, nil, nil, nil)
-			card:set_edition({
-				negative = true
-			})
-			card:add_to_deck()
-			G.consumeables:emplace(card)
-			card:juice_up(0.3, 0.5)
-			return {completed=true}
-		end
-	end
-}
-
-local copypaste = {
-	object_type = "Joker",
-	name = "cry-copypaste",
-	key = "copypaste",
-	pos = {x = 3, y = 4},
-	config = {extra = {odds = 2, ckt = 0}},
-	loc_txt = {
-        name = 'Copy/Paste',
-        text = {
-			"When a {C:cry_code}Code{} card is used,",
-                "{C:green}#1# in #2#{} chance to add a copy",
-                "to your consumable area",
-                "{C:inactive}(Must have room)"
-		}
-    },
-	rarity = "cry_epic",
-	cost = 14,
-	blueprint_compat = true,
-	loc_vars = function(self, info_queue, center)
-		return {vars = {''..(G.GAME and G.GAME.probabilities.normal or 1), (center and center.ability.extra.odds or 2)}}
-    end,
-	atlas = "atlasepic",
-	calculate = function(self, card, context)
-		if context.using_consumeable and context.consumeable.ability.set == 'Code' and not context.consumeable.beginning_end then
-			if #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
-				if pseudorandom("cry_copypaste_joker") < G.GAME.probabilities.normal/card.ability.extra.odds then
-					if G.GAME.probabilities.normal >= card.ability.extra.odds and context.consumeable.from_copypaste then
-						card.ability.extra.ckt = card.ability.extra.ckt + 1
-					else
-						card.ability.extra.ckt = 0
-					end
-					G.E_MANAGER:add_event(Event({
-                        func = function() 
-                            local cards = copy_card(context.consumeable)
-                            if card.ability.extra.ckt >= 10 then 
-                                cards.beginning_end = true
-                                card.ability.extra.ckt = 0
-                            else
-                                cards.from_from_copypaste = true
-                            end
-                            cards:add_to_deck()
-                            G.consumeables:emplace(cards) 
-                            return true
-                        end}))
-                    card_eval_status_text(context.blueprint_cards or card, 'extra', nil, nil, nil, {message = localize('k_copied_ex')})
-                end
-            end
-        end
-	end
-}
-if JokerDisplay then
-	copypaste.joker_display_definition = {
-		extra = {
-			{
-				{ text = "(" },
-				{ ref_table = "card.joker_display_values", ref_value = "odds" },
-				{ text = " in " },
-				{ ref_table = "card.ability.extra",        ref_value = "odds" },
-				{ text = ")" },
-			}
-		},
-		extra_config = { colour = G.C.GREEN, scale = 0.3 },
-		calc_function = function(card)
-			card.joker_display_values.odds = G.GAME and G.GAME.probabilities.normal or 1
-		end
-	}
-end
-
 local boredom = {
 	object_type = "Joker",
 	name = "cry-Boredom",
 	key = "boredom",
 	pos = {x = 1, y = 0},
 	config = {extra = {odds = 2}},
+	immune_to_chemach = true,
 	loc_txt = {
         name = 'Boredom',
         text = {
@@ -1203,6 +1116,7 @@ local bonusjoker = {
 	key = "bonusjoker",
 	pos = {x = 3, y = 2},
 	config = {extra = {odds = 8, check = 0}},
+	immune_to_chemach = true,
 	loc_txt = {
         name = 'Bonus Joker',
         text = {
@@ -1292,6 +1206,7 @@ local multjoker = {
 	key = "multjoker",
 	pos = {x = 2, y = 3},
 	config = {extra = {odds = 4}},
+	immune_to_chemach = true,
 	loc_txt = {
         name = 'Mult Joker',
         text = {
@@ -1439,6 +1354,7 @@ local altgoogol = {
 	name = "cry-altgoogol",
 	key = "altgoogol",
 	pos = {x = 4, y = 3},
+	immune_to_chemach = true,
 	loc_txt = {
         name = 'Nostalgic Googol Play Card',
         text = {
@@ -1495,6 +1411,7 @@ local soccer = {
 	key = "soccer",
 	pos = {x = 1, y = 4},
 	config = {extra = {holygrail = 1}},
+	immune_to_chemach = true,
 	loc_txt = {
         name = 'One for All', --changed the name from latin because this isn't exotic
         text = {
@@ -1616,4 +1533,4 @@ return {name = "Epic Jokers",
                 loc_txt = {}
             },true)
 		end,
-		items = {}}
+    items = {}}

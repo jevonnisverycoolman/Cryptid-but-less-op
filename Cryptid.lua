@@ -5,8 +5,8 @@
 --- MOD_AUTHOR: [MathIsFun_, Balatro Discord]
 --- MOD_DESCRIPTION: Adds unbalanced ideas to Balatro.
 --- BADGE_COLOUR: 708b91
---- DEPENDENCIES: [Talisman>=2.0.0-beta4, Steamodded>=1.0.0~ALPHA-0812d]
---- VERSION: 0.4.3i
+--- DEPENDENCIES: [Talisman>=2.0.0-beta4, Steamodded>=1.0.0~ALPHA-0820b]
+--- VERSION: 0.5.0-pre
 
 ----------------------------------------------
 ------------MOD CODE -------------------------
@@ -902,6 +902,7 @@ function init_localization()
     G.localization.misc.v_text.ch_c_cry_rush_hour_iii = {"{C:attention}The Clock{} and {C:attention}Lavender Loop{} scale {C:attention}twice{} as fast"}
     G.localization.misc.v_text.ch_c_cry_no_tags = {"Skipping is {C:attention}disabled{}"}
     G.localization.misc.dictionary.k_cry_program_pack = "Program Pack"
+    G.localization.misc.dictionary.k_cry_meme_pack = "Meme Pack"
     G.localization.misc.labels.food_jokers = "Food Jokers"
     G.localization.misc.labels.banana = "Banana"
 end
@@ -1037,6 +1038,19 @@ end
 
 function SMODS.current_mod.reset_game_globals(run_start)
     G.GAME.cry_ach_conditions = G.GAME.cry_ach_conditions or {}
+end
+
+--Fix a corrupted game state
+function Controller:queue_L_cursor_press(x, y)
+    if self.locks.frame then return end
+    if G.STATE == G.STATES.SPLASH then
+        if not G.HUD then 
+            self:key_press('escape')
+        else
+            G.STATE = G.STATES.BLIND_SELECT
+        end
+    end
+    self.L_cursor_queue = {x = x, y = y}
 end
 
 --Used to check to play the exotic music
@@ -1261,12 +1275,41 @@ SMODS.Atlas({
 SMODS.Sticker:take_ownership('perishable', {
     atlas = "sticker",
     pos = {x = 4, y = 4},
-    prefix_config = {key = false}
+    prefix_config = {key = false},
+    loc_vars = function(self, info_queue, card)
+        if card.ability.consumeable then return {key = 'cry_perishable_consumeable'}
+	elseif card.ability.set == 'Voucher' then return {key = 'cry_perishable_voucher', vars = {G.GAME.cry_voucher_perishable_rounds or 1, card.ability.perish_tally or G.GAME.cry_voucher_perishable_rounds}}
+	elseif card.ability.set == 'Booster' then return {key = 'cry_perishable_booster'}
+	else return {vars = {G.GAME.perishable_rounds or 1, card.ability.perish_tally or G.GAME.perishable_rounds}}
+	end
+    end
 })
 SMODS.Sticker:take_ownership('pinned', {
     atlas = "sticker",
     pos = {x = 5, y = 0},
-    prefix_config = {key = false}
+    prefix_config = {key = false},
+    loc_vars = function(self, info_queue, card)
+        if card.ability.consumeable then return {key = 'cry_pinned_consumeable'}		-- this doesn't work. i want this to work :(
+	elseif card.ability.set == 'Voucher' then return {key = 'cry_pinned_voucher'}
+	elseif card.ability.set == 'Booster' then return {key = 'cry_pinned_booster'}
+	end
+    end
+})
+SMODS.Sticker:take_ownership('eternal', {
+    loc_vars = function(self, info_queue, card)
+	if card.ability.set == 'Voucher' then return {key = 'cry_eternal_voucher'}
+	elseif card.ability.set == 'Booster' then return {key = 'cry_eternal_booster'}
+	end
+    end
+})
+SMODS.Sticker:take_ownership('rental', {
+    loc_vars = function(self, info_queue, card)
+        if card.ability.consumeable then return {key = 'cry_rental_consumeable', vars = {G.GAME.cry_consumeable_rental_rate or 1}}
+	elseif card.ability.set == 'Voucher' then return {key = 'cry_rental_voucher', vars = {G.GAME.cry_voucher_rental_rate or 1}}
+	elseif card.ability.set == 'Booster' then return {key = 'cry_rental_booster'}
+	else return {vars = {G.GAME.rental_rate or 1}}
+	end
+    end
 })
 ----------------------------------------------
 ------------MOD CODE END----------------------
